@@ -1,0 +1,116 @@
+import { Box, Button } from "@mui/material";
+import Dice from "../../components/Dice";
+import { useContext, useEffect, useState } from "react";
+import Header from "../../components/Header";
+import SelectBet from "../../components/SelectBet";
+import { playBet } from "../../services/playBet";
+import { AppDataContext } from "../../utils/AppDataContext";
+import { UserContext } from "../../utils/userContext";
+import Confetti from "react-confetti";
+
+const GameScreen = () => {
+  const [betPrice, setBetPrice] = useState(0);
+  const [betType, setBetType] = useState(null);
+  const [firstDiceCount, setFirstDiceCount] = useState();
+  const [secondDiceCount, setSecondDiceCount] = useState();
+  const [selectedBetPriceButton, setSelectedBetPriceButton] = useState();
+  const [selectedBetTypeButton, setSelectedBetTypeButton] = useState();
+  const { setAlertData, setIsExploding, isExploding } =
+    useContext(AppDataContext);
+  const { setUserPoints } = useContext(UserContext);
+  const [explosionTimerId, setExplosionTimerId] = useState(null);
+
+  useEffect(() => {
+    return () => {
+      if (explosionTimerId) {
+        clearTimeout(explosionTimerId);
+      }
+    };
+  }, []);
+  async function handlePLayBet() {
+    if (!betType) {
+      setAlertData({
+        show: true,
+        message: "Select Bet type",
+        severity: "error",
+      });
+      return;
+    } else if (!betPrice) {
+      setAlertData({
+        show: true,
+        message: "Select Bet price",
+        severity: "error",
+      });
+      return;
+    }
+    const resp = await playBet(betType, betPrice);
+
+    if (resp && resp.status !== "error") {
+      setIsExploding(true);
+      const timerId = setTimeout(() => {
+        setIsExploding(false);
+        setExplosionTimerId(null);
+      }, 3000);
+      setExplosionTimerId(timerId);
+      setFirstDiceCount(resp.data.result[0]);
+      setSecondDiceCount(resp.data.result[1]);
+      setUserPoints(resp.data.newPoints || 0);
+      if (resp.data.userWon) {
+        setAlertData({
+          show: true,
+          message: "You won the bet!!",
+          severity: "success",
+        });
+      } else {
+        setAlertData({
+          show: true,
+          message: "You Lost the bet!!",
+          severity: "error",
+        });
+      }
+    }
+    setBetPrice(0);
+    setBetType(null);
+    setSelectedBetPriceButton();
+    setSelectedBetTypeButton();
+  }
+  return (
+    <Box display="flex" flexDirection="column" rowGap="1.5rem" minHeight="95vh">
+      {isExploding && (
+        <Confetti
+          width={window.innerWidth}
+          height={window.innerHeight}
+          confettiSource={{ x: 0, y: window.innerHeight, w: 10, h: 10 }}
+          initialVelocityX={12}
+          initialVelocityY={15}
+        />
+      )}
+
+      <Header />
+      <SelectBet
+        setBetPrice={setBetPrice}
+        setBetType={setBetType}
+        selectedBetPriceButton={selectedBetPriceButton}
+        setSelectedBetPriceButton={setSelectedBetPriceButton}
+        selectedBetTypeButton={selectedBetTypeButton}
+        setSelectedBetTypeButton={setSelectedBetTypeButton}
+      />
+      <Box flex={1} display="flex" justifyContent="center" alignItems="center">
+        <Dice
+          firstDiceCount={firstDiceCount}
+          secondDiceCount={secondDiceCount}
+        />
+      </Box>
+      <Button
+        variant="contained"
+        color="success"
+        onClick={handlePLayBet}
+        sx={{ p: "1rem" }}
+      >
+        Play Bet
+      </Button>
+    </Box>
+  );
+};
+
+export default GameScreen;

@@ -1,0 +1,9 @@
+@font-face {
+  font-family: "SuperMaizen";
+  src: local("SuperMaizen"), url(./fonts/SuperMaizen.ttf) format("truetype");
+}
+
+#root {
+  box-sizing: border-box;
+  font-family: SuperMaizen;
+}
