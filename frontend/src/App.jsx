@@ -6,6 +6,7 @@ import { UserContext } from "./utils/userContext";
 import Routes from "./routes.jsx";
 import { validateToken } from "./services/validateToken.js";
 import SnackBar from "./components/snackbar/index.jsx";
+import { Box } from "@mui/material";
 
 function App() {
   const { isAuthenticated, setIsAuthenticated, setUserPoints } =
@@ -23,12 +24,12 @@ function App() {
     })();
   }, []);
   return (
-    <>
+    <Box className="background">
       <RouterProvider
         router={isAuthenticated ? Routes.privateRoutes : Routes.publiRoutes}
       />
       <SnackBar />
-    </>
+    </Box>
   );
 }
 

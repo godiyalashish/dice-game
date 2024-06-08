@@ -46,6 +46,7 @@ export async function loginController(
       message: "Invalid email or password",
     });
   } catch (error) {
+    console.log(error);
     if (error instanceof z.ZodError) {
       res.status(400).json({
         message: "Validation error",

@@ -3,7 +3,24 @@
   src: local("SuperMaizen"), url(./fonts/SuperMaizen.ttf) format("truetype");
 }
 
-#root {
-  box-sizing: border-box;
-  font-family: SuperMaizen;
+.background {
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.background::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("./assets/bg.jpg");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  filter: blur(4px);
+  z-index: -1;
 }

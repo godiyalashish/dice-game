@@ -1,4 +1,4 @@
-import { Box, Button } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import Dice from "../../components/Dice";
 import { useContext, useEffect, useState } from "react";
 import Header from "../../components/Header";
@@ -7,6 +7,9 @@ import { playBet } from "../../services/playBet";
 import { AppDataContext } from "../../utils/AppDataContext";
 import { UserContext } from "../../utils/userContext";
 import Confetti from "react-confetti";
+import rollSound from "../../assets/rolling-dice.mp3";
+import victorySound from "../../assets/victory.mp3";
+import useSound from "use-sound";
 
 const GameScreen = () => {
   const [betPrice, setBetPrice] = useState(0);
@@ -19,6 +22,9 @@ const GameScreen = () => {
     useContext(AppDataContext);
   const { setUserPoints } = useContext(UserContext);
   const [explosionTimerId, setExplosionTimerId] = useState(null);
+  const [diceRolledFunction, setDiceRolledFunction] = useState(() => () => {});
+  const [diceRollSound] = useSound(rollSound);
+  const [victory] = useSound(victorySound);
 
   useEffect(() => {
     return () => {
@@ -27,6 +33,7 @@ const GameScreen = () => {
       }
     };
   }, []);
+
   async function handlePLayBet() {
     if (!betType) {
       setAlertData({
@@ -46,28 +53,44 @@ const GameScreen = () => {
     const resp = await playBet(betType, betPrice);
 
     if (resp && resp.status !== "error") {
-      setIsExploding(true);
-      const timerId = setTimeout(() => {
-        setIsExploding(false);
-        setExplosionTimerId(null);
-      }, 3000);
-      setExplosionTimerId(timerId);
       setFirstDiceCount(resp.data.result[0]);
       setSecondDiceCount(resp.data.result[1]);
       setUserPoints(resp.data.newPoints || 0);
+      diceRollSound();
       if (resp.data.userWon) {
-        setAlertData({
-          show: true,
-          message: "You won the bet!!",
-          severity: "success",
+        setDiceRolledFunction(() => () => {
+          setIsExploding(true);
+          const timerId = setTimeout(() => {
+            setIsExploding(false);
+            setExplosionTimerId(null);
+          }, 3000);
+          setExplosionTimerId(timerId);
+          setAlertData({
+            show: true,
+            message: "You won the bet!!",
+            severity: "success",
+          });
+          victory();
         });
       } else {
-        setAlertData({
-          show: true,
-          message: "You Lost the bet!!",
-          severity: "error",
+        setDiceRolledFunction(() => () => {
+          setAlertData({
+            show: true,
+            message: "You Lost the bet!!",
+            severity: "error",
+          });
         });
       }
+    } else {
+      setAlertData({
+        show: true,
+        message: "You Lost the bet!!",
+        severity: "error",
+      });
+      setBetType(null);
+      setSelectedBetPriceButton();
+      setSelectedBetTypeButton();
+      return;
     }
     setBetPrice(0);
     setBetType(null);
@@ -75,18 +98,25 @@ const GameScreen = () => {
     setSelectedBetTypeButton();
   }
   return (
-    <Box display="flex" flexDirection="column" rowGap="1.5rem" minHeight="95vh">
+    <Box
+      display="flex"
+      flexDirection="column"
+      rowGap="1.5rem"
+      minHeight="95vh"
+      p="2rem"
+    >
       {isExploding && (
         <Confetti
           width={window.innerWidth}
           height={window.innerHeight}
           confettiSource={{ x: 0, y: window.innerHeight, w: 10, h: 10 }}
-          initialVelocityX={12}
-          initialVelocityY={15}
+          initialVelocityX={20}
+          initialVelocityY={20}
         />
       )}
 
       <Header />
+
       <SelectBet
         setBetPrice={setBetPrice}
         setBetType={setBetType}
@@ -99,6 +129,7 @@ const GameScreen = () => {
         <Dice
           firstDiceCount={firstDiceCount}
           secondDiceCount={secondDiceCount}
+          rollDone={diceRolledFunction}
         />
       </Box>
       <Button
@@ -107,7 +138,7 @@ const GameScreen = () => {
         onClick={handlePLayBet}
         sx={{ p: "1rem" }}
       >
-        Play Bet
+        <Typography variant="h5">Play Bet</Typography>
       </Button>
     </Box>
   );

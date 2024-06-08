@@ -22,7 +22,7 @@ export async function playController(
     const userPoints = user?.points || 0;
     let newPoints = userPoints - parseInt(bet);
     if (userPoints === 0) {
-      res.status(400).json({
+      return res.status(400).json({
         message: "ponts are zero",
       });
     }
@@ -52,13 +52,13 @@ export async function playController(
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      res.status(400).json({
+      return res.status(400).json({
         message: "Validation error",
         errors: error.errors,
       });
     } else {
       console.log(error);
-      res.status(500).json({
+      return res.status(500).json({
         message: "Internal server error",
       });
     }

@@ -1,0 +1,40 @@
+/* App.css */
+.loginBackground {
+  background-image: url("../../assets/loginSignup.png");
+  background-position: center;
+  background-size: cover;
+  margin-top: 8;
+  display: "flex";
+  flex-direction: "column";
+  align-items: "center";
+  padding: 5rem 7.6rem;
+  width: 35%;
+  filter: drop-shadow(1rem 1rem 30px black);
+}
+
+@media (max-width: 1400px) {
+  .loginBackground {
+    padding: 3rem 5.6rem;
+    width: 45%;
+  }
+}
+@media (max-width: 1115px) {
+  .loginBackground {
+    padding: 2rem 4.6rem;
+    width: 55%;
+  }
+}
+
+@media (max-width: 845px) {
+  .loginBackground {
+    padding: 2rem 3rem;
+    width: 90%;
+  }
+}
+
+#password-helper-text {
+  color: #ffdc5d;
+}
+#email-helper-text {
+  color: #ffdc5d;
+}
