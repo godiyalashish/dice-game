@@ -63,7 +63,7 @@ const GameScreen = () => {
           const timerId = setTimeout(() => {
             setIsExploding(false);
             setExplosionTimerId(null);
-          }, 3000);
+          }, 5000);
           setExplosionTimerId(timerId);
           setAlertData({
             show: true,
