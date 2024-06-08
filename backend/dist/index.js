@@ -10,6 +10,6 @@ const gameRouter_1 = __importDefault(require("./routes/gameRouter"));
 const cors_1 = __importDefault(require("cors"));
 exports.app = (0, express_1.default)();
 exports.app.use(express_1.default.json());
-exports.app.use((0, cors_1.default)({ origin: "http://localhost:5173" }));
+exports.app.use((0, cors_1.default)());
 exports.app.use("/auth", authRoutes_1.default);
 exports.app.use("/game", gameRouter_1.default);
