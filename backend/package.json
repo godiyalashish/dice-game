@@ -4,8 +4,8 @@
   "main": "index.js",
   "scripts": {
     "test": "vitest",
-    "build": "tsc -b --w",
-    "dev": "nodemon --env-file=.env dist/bin.js"
+    "build": "npx prisma generate",
+    "start": "node dist/bin.js"
   },
   "keywords": [],
   "author": "",
